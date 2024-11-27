@@ -15,7 +15,7 @@
         <activity
             android:name=".SecondActivity"
             android:exported="false" />
-<!--        <activity
+ <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
@@ -23,12 +23,12 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>-->
+        </activity>
         <activity android:name=".QuizActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category" />
             </intent-filter>
         </activity>
         <activity android:name=".QuizResultActivity" />
