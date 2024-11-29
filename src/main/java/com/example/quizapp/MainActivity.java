@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
                 String userName = txtAcc.getText().toString();
                 String password = txtPassword.getText().toString();
 
+                
                 String savedUser = sh.getString("username", "");
                 String savedPassword = sh.getString("password", "");
 
