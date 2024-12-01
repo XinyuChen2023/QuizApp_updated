@@ -36,7 +36,7 @@ public class QuizResultActivity extends AppCompatActivity {
             finish();
         });
 
-        // Set a click listener for the "View Account" button
+
 
         viewAccountButton.setOnClickListener(v -> {
             // Navigate to the account screen (assume AccountActivity exists)
