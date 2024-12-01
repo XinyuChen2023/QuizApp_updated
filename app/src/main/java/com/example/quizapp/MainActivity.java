@@ -1,5 +1,7 @@
 package com.example.quizapp;
 
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -18,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
     EditText txtAcc, txtPassword;
     Button btnLogin, btnCreate;
     SharedPreferences sh;
+    DatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
         txtPassword = findViewById(R.id.txtPassword);
         sh = getSharedPreferences("UserPrefs", MODE_PRIVATE);
 
+        dbHelper = new DatabaseHelper(this);
+
         btnLogin = findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -40,15 +45,18 @@ public class MainActivity extends AppCompatActivity {
                 String userName = txtAcc.getText().toString();
                 String password = txtPassword.getText().toString();
 
+                
                 String savedUser = sh.getString("username", "");
                 String savedPassword = sh.getString("password", "");
 
                 if(userName.equals(savedUser) && password.equals(savedPassword)){
-                    Intent intent = new Intent(MainActivity.this, SecondActivity.class);
+                    Intent intent = new Intent(MainActivity.this, QuizActivity.class);
                     startActivity(intent);
                 }else{
                     Toast.makeText(MainActivity.this, "Wrong user name or password, please try again",
                             Toast.LENGTH_SHORT).show();
+                }if (userName.isEmpty() || password.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Please enter both username and password", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -59,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 SharedPreferences.Editor editor = sh.edit();
                 editor.putString("username", txtAcc.getText().toString());
-                editor.putString("username", txtPassword.getText().toString());
+                editor.putString("password", txtPassword.getText().toString());
                 editor.apply();
                 Toast.makeText(MainActivity.this, "Congregation! You have successfully create an account!",
                         Toast.LENGTH_SHORT).show();

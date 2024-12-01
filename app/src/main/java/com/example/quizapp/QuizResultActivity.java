@@ -14,13 +14,12 @@ public class QuizResultActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz_result);
 
-        // Find views in the layout
+
         TextView dateTextView = findViewById(R.id.current_date);
         TextView userScoreTextView = findViewById(R.id.user_score);
         Button tryNewQuizButton = findViewById(R.id.try_new_quiz_button);
         Button viewAccountButton = findViewById(R.id.view_account_button);
 
-        // Retrieve data passed via Intent
         int score = getIntent().getIntExtra("SCORE", 0);
         String date = getIntent().getStringExtra("DATE");
 
@@ -38,13 +37,13 @@ public class QuizResultActivity extends AppCompatActivity {
         });
 
         // Set a click listener for the "View Account" button
-        /*
+
         viewAccountButton.setOnClickListener(v -> {
             // Navigate to the account screen (assume AccountActivity exists)
-            Intent intent = new Intent(QuizResultActivity.this, AccountActivity.class);
+            Intent intent = new Intent(QuizResultActivity.this, ChangePasswordActivity.class);
             startActivity(intent);
         });
-        */
+
 
     }
 }
