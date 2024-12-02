@@ -3,12 +3,14 @@ package com.example.quizapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -30,7 +32,7 @@ public class QuizActivity extends AppCompatActivity {
     private RadioButton option1, option2, option3, option4;
     private Button prevButton, submitButton;
 
-    private List<Question> questionList = new ArrayList<>(); // Initialize to avoid null checks
+    private List<Question> questionList = new ArrayList<>();
     private int currentQuestionIndex = 0;
     private int[] selectedAnswers;
 
@@ -100,6 +102,7 @@ public class QuizActivity extends AppCompatActivity {
     private void setupButtonListeners() {
         prevButton.setOnClickListener(v -> {
             if (currentQuestionIndex > 0) {
+                saveSelectedAnswer();
                 currentQuestionIndex--;
                 loadQuestion();
             }
@@ -160,15 +163,12 @@ public class QuizActivity extends AppCompatActivity {
     private void saveSelectedAnswer() {
         int selectedOptionId = optionsGroup.getCheckedRadioButtonId();
         if (selectedOptionId == -1) {
-            Toast.makeText(this, "Please select an answer", Toast.LENGTH_SHORT).show();
-            return;
+            return; // No answer selected
         }
 
         try {
             int selectedOptionIndex = optionsGroup.indexOfChild(findViewById(selectedOptionId));
-            if (currentQuestionIndex >= 0 && currentQuestionIndex < selectedAnswers.length) {
-                selectedAnswers[currentQuestionIndex] = selectedOptionIndex;
-            }
+            selectedAnswers[currentQuestionIndex] = selectedOptionIndex;
         } catch (Exception e) {
             e.printStackTrace();
             showToast("An error occurred while saving the answer.");
@@ -177,20 +177,15 @@ public class QuizActivity extends AppCompatActivity {
 
     // Submit the quiz and calculate the score
     private void submitQuiz() {
-        try {
-            saveSelectedAnswer();
+        saveSelectedAnswer();
 
-            int score = calculateScore();
+        int score = calculateScore();
 
-            Intent intent = new Intent(QuizActivity.this, QuizResultActivity.class);
-            intent.putExtra("SCORE", score);
-            intent.putExtra("DATE", getCurrentDate());
-            startActivity(intent);
-            finish();
-        } catch (Exception e) {
-            e.printStackTrace();
-            showToast("An error occurred while submitting the quiz.");
-        }
+        Intent intent = new Intent(QuizActivity.this, QuizResultActivity.class);
+        intent.putExtra("SCORE", score);
+        intent.putExtra("DATE", getCurrentDate());
+        startActivity(intent);
+        finish();
     }
 
     // Calculate the quiz score
@@ -199,19 +194,17 @@ public class QuizActivity extends AppCompatActivity {
 
         for (int i = 0; i < questionList.size(); i++) {
             Question question = questionList.get(i);
-            if (i < selectedAnswers.length && selectedAnswers[i] != -1) {
-                String selectedAnswerText = "";
-                try {
-                    selectedAnswerText = ((RadioButton) optionsGroup.getChildAt(selectedAnswers[i])).getText().toString();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
 
-                if (selectedAnswerText.equals(Html.fromHtml(question.getCorrectAnswer(), Html.FROM_HTML_MODE_LEGACY).toString())) {
+            if (i < selectedAnswers.length && selectedAnswers[i] != -1) {
+                String selectedAnswer = ((RadioButton) optionsGroup.getChildAt(selectedAnswers[i])).getText().toString().trim();
+                String correctAnswer = Html.fromHtml(question.getCorrectAnswer(), Html.FROM_HTML_MODE_LEGACY).toString().trim();
+
+                if (selectedAnswer.equalsIgnoreCase(correctAnswer)) {
                     score++;
                 }
             }
         }
+
         return score;
     }
 
