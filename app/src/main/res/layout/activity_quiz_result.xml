@@ -70,7 +70,7 @@
         android:id="@+id/view_account_button"
         android:layout_width="140dp"
         android:layout_height="57dp"
-        android:text="VIEW ACCOUNT"
+        android:text="Change Password"
         android:textColor="#FFFFFF"
         android:backgroundTint="#3949ab"
         app:layout_constraintBottom_toBottomOf="parent"

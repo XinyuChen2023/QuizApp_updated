@@ -1,9 +1,6 @@
 package com.example.quizapp;
 
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -19,7 +16,6 @@ import androidx.core.view.WindowInsetsCompat;
 public class MainActivity extends AppCompatActivity {
     EditText txtAcc, txtPassword;
     Button btnLogin, btnCreate;
-    SharedPreferences sh;
     DatabaseHelper dbHelper;
 
     @Override
@@ -32,31 +28,34 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
         txtAcc = findViewById(R.id.txtAcc);
         txtPassword = findViewById(R.id.txtPassword);
-        sh = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-
         dbHelper = new DatabaseHelper(this);
 
         btnLogin = findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String userName = txtAcc.getText().toString();
-                String password = txtPassword.getText().toString();
+                String userName = txtAcc.getText().toString().trim();
+                String password = txtPassword.getText().toString().trim();
 
-                
-                String savedUser = sh.getString("username", "");
-                String savedPassword = sh.getString("password", "");
+                if (userName.isEmpty() || password.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Please enter both username and password", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-                if(userName.equals(savedUser) && password.equals(savedPassword)){
+                if (dbHelper.authenticateUser(userName, password)) {
+                    // Save the username in SharedPreferences for future use
+                    getSharedPreferences("UserPrefs", MODE_PRIVATE)
+                            .edit()
+                            .putString("username", userName)
+                            .apply();
+
                     Intent intent = new Intent(MainActivity.this, QuizActivity.class);
                     startActivity(intent);
-                }else{
-                    Toast.makeText(MainActivity.this, "Wrong user name or password, please try again",
-                            Toast.LENGTH_SHORT).show();
-                }if (userName.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(MainActivity.this, "Please enter both username and password", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "Wrong username or password, please try again", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -65,12 +64,20 @@ public class MainActivity extends AppCompatActivity {
         btnCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SharedPreferences.Editor editor = sh.edit();
-                editor.putString("username", txtAcc.getText().toString());
-                editor.putString("password", txtPassword.getText().toString());
-                editor.apply();
-                Toast.makeText(MainActivity.this, "Congregation! You have successfully create an account!",
-                        Toast.LENGTH_SHORT).show();
+                String userName = txtAcc.getText().toString().trim();
+                String password = txtPassword.getText().toString().trim();
+
+                if (userName.isEmpty() || password.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Please enter both username and password", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                boolean isAdded = dbHelper.addUser(userName, password);
+                if (isAdded) {
+                    Toast.makeText(MainActivity.this, "Account created successfully!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "Account creation failed. Username may already exist.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
